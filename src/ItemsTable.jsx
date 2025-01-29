@@ -11,7 +11,7 @@ const ItemsTable = () => {
 
   const fetchItems = async () => {
     try {
-      const response = await axios.get('https://your-lambda-api-gateway-url/items');
+      const response = await axios.get('/api/products');
       setItems(response.data);
     } catch (err) {
       setError('Failed to fetch items. Please try again later.');
