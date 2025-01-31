@@ -64,7 +64,7 @@ const ItemsTable = () => {
 
   // Update an item's field
   const updateItem = async (productId) => {
-    const updateKey = prompt('Enter the field to update (e.g., price, name, stock):');
+    const updateKey = prompt('Enter the field to update (e.g., price, description, stock):');
     const updatedValue = prompt(`Enter new value for ${updateKey}:`);
     if (!updateKey || !updatedValue) return;
 
