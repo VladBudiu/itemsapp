@@ -9,6 +9,8 @@ const ItemsTable = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredItem, setFilteredItem] = useState(null);
 
   // Fetch all items from the backend
   const fetchItems = async () => {
@@ -20,6 +22,27 @@ const ItemsTable = () => {
       setError('Failed to fetch items. Please try again later.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Search for a specific item by productId
+  const searchItem = async () => {
+    if (!searchQuery.trim()) return;
+
+    try {
+      const response = await axios.get(`${API_BASE_URL}/product`, {
+        params: { productId: searchQuery },
+      });
+      if (response.data) {
+        setFilteredItem(response.data);
+      } else {
+        setFilteredItem(null);
+        alert('Item not found.');
+      }
+    } catch (err) {
+      console.error('Error fetching item:', err);
+      alert('Item not found.');
+      setFilteredItem(null);
     }
   };
 
@@ -85,6 +108,13 @@ const ItemsTable = () => {
     }
   };
 
+  const resetSearch = () => {
+    setSearchQuery('');
+    setFilteredItem(null);
+    fetchItems();
+  };
+
+
   useEffect(() => {
     fetchItems();
   }, []);
@@ -95,7 +125,20 @@ const ItemsTable = () => {
   return (
     <div className="table-container">
       <h1 className="title">Products</h1>
-      {items.length > 0 ? (
+      
+      {/* Search Bar */}
+      <div className="search-bar">
+        <input
+          type="text"
+          placeholder="Enter Product ID"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <button onClick={searchItem}>Search</button>
+        <button onClick={resetSearch}>Reset</button>
+      </div>
+      
+      {filteredItem ? (
         <table className="items-table">
           <thead>
             <tr>
@@ -109,28 +152,58 @@ const ItemsTable = () => {
             </tr>
           </thead>
           <tbody>
-            {items.map((item) => (
-              <tr key={item.productId}>
-                <td>{item.productId}</td>
-                <td>{item.price}</td>
-                <td>{item.name}</td>
-                <td>{item.description}</td>
-                <td>{item.category}</td>
-                <td>{item.stock}</td>
-                <td>
-                  <button onClick={() => updateItem(item.productId)}>Update</button>
-                  <button onClick={() => deleteItem(item.productId)}>Delete</button>
-                </td>
-              </tr>
-            ))}
+            <tr key={filteredItem.productId}>
+              <td>{filteredItem.productId}</td>
+              <td>{filteredItem.price}</td>
+              <td>{filteredItem.name}</td>
+              <td>{filteredItem.description}</td>
+              <td>{filteredItem.category}</td>
+              <td>{filteredItem.stock}</td>
+              <td>
+                <button onClick={() => updateItem(filteredItem.productId)}>Update</button>
+                <button onClick={() => deleteItem(filteredItem.productId)}>Delete</button>
+              </td>
+            </tr>
           </tbody>
         </table>
       ) : (
-        <div className="no-items">No items found.</div>
+        <>
+          {items.length > 0 ? (
+            <table className="items-table">
+              <thead>
+                <tr>
+                  <th>Product ID</th>
+                  <th>Price</th>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th>Category</th>
+                  <th>Stock</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((item) => (
+                  <tr key={item.productId}>
+                    <td>{item.productId}</td>
+                    <td>{item.price}</td>
+                    <td>{item.name}</td>
+                    <td>{item.description}</td>
+                    <td>{item.category}</td>
+                    <td>{item.stock}</td>
+                    <td>
+                      <button onClick={() => updateItem(item.productId)}>Update</button>
+                      <button onClick={() => deleteItem(item.productId)}>Delete</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <div className="no-items">No items found.</div>
+          )}
+        </>
       )}
-      <button className="add-button" onClick={addItem}>
-        Add New Entry
-      </button>
+      <button className="add-button" onClick={addItem}>Add New Entry</button>
     </div>
   );
 };

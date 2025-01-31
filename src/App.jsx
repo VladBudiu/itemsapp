@@ -10,7 +10,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1 className="text-2xl font-bold mb-6">Welcome to My App</h1>
+        <h1 className="text-2xl font-bold mb-6">Welcome to my App</h1>
       </header>
       {/* Render the ItemsTable component */}
       <ItemsTable />
